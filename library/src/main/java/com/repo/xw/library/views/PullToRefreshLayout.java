@@ -2,6 +2,7 @@ package com.repo.xw.library.views;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
@@ -47,12 +48,10 @@ public class PullToRefreshLayout extends RelativeLayout {
     private View refreshView; // 下拉头
     private ImageView refreshArrowImg;    // 下拉的箭头
     private ProgressBar refreshingBar;     // 正在刷新的图标
-    private View refreshStateImageView;    // 刷新结果图标
     private TextView refreshStateTextView;    // 刷新结果：成功或失败
     private View loadMoreView;    // 上拉头
     private ImageView loadArrowImg;    // 上拉的箭头
     private ProgressBar loadingBar;    // 正在加载的图标
-    private View loadStateImageView;    // 加载结果图标
     private TextView loadStateTextView;    // 加载结果：成功或失败
 
     private View pullableView;    // 实现了Pullable接口的View
@@ -115,13 +114,11 @@ public class PullToRefreshLayout extends RelativeLayout {
         refreshArrowImg = (ImageView) refreshView.findViewById(R.id.head_arrow_img);
         refreshStateTextView = (TextView) refreshView.findViewById(R.id.head_hint_text);
         refreshingBar = (ProgressBar) refreshView.findViewById(R.id.head_progress_bar);
-        refreshStateImageView = refreshView.findViewById(R.id.head_state_img);
         // 初始化上拉布局
         loadArrowImg = (ImageView) loadMoreView.findViewById(R.id.foot_arrow_img);
         rotateArrow(loadArrowImg);
         loadStateTextView = (TextView) loadMoreView.findViewById(R.id.foot_hint_text);
         loadingBar = (ProgressBar) loadMoreView.findViewById(R.id.foot_progress_bar);
-        loadStateImageView = loadMoreView.findViewById(R.id.foot_state_img);
     }
 
     private void hide() {
@@ -134,21 +131,21 @@ public class PullToRefreshLayout extends RelativeLayout {
      * @param isSuccess true成功，false失败
      */
     public void refreshFinish(boolean isSuccess) {
-        if (refreshingBar == null || refreshStateImageView == null || refreshStateTextView == null)
+        if (refreshingBar == null || refreshStateTextView == null)
             return;
         refreshingBar.clearAnimation();
         refreshingBar.setVisibility(View.GONE);
 
         if (isSuccess) {
             // 刷新成功
-            refreshStateImageView.setVisibility(View.VISIBLE);
             refreshStateTextView.setText(R.string.refresh_succeed);
-            refreshStateImageView.setBackgroundResource(R.mipmap.icon_refresh_succeed);
+            Drawable drawable = getResources().getDrawable(R.mipmap.icon_refresh_succeed);
+            refreshStateTextView.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
         } else {
             // 刷新失败
-            refreshStateImageView.setVisibility(View.VISIBLE);
             refreshStateTextView.setText(R.string.refresh_fail);
-            refreshStateImageView.setBackgroundResource(R.mipmap.icon_refresh_failed);
+            Drawable drawable = getResources().getDrawable(R.mipmap.icon_refresh_failed);
+            refreshStateTextView.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
         }
         if (pullDownY > 0) {
             // 刷新结果停留1秒
@@ -171,21 +168,21 @@ public class PullToRefreshLayout extends RelativeLayout {
      * @param isSuccess true成功，false代表失败
      */
     public void loadMoreFinish(boolean isSuccess) {
-        if (loadingBar == null || loadStateImageView == null || loadStateTextView == null)
+        if (loadingBar == null  || loadStateTextView == null)
             return;
         loadingBar.clearAnimation();
         loadingBar.setVisibility(View.GONE);
 
         if (isSuccess) {
             // 加载成功
-            loadStateImageView.setVisibility(View.VISIBLE);
             loadStateTextView.setText(R.string.load_succeed);
-            loadStateImageView.setBackgroundResource(R.mipmap.icon_load_succeed);
+            Drawable drawable = getResources().getDrawable(R.mipmap.icon_load_succeed);
+            loadStateTextView.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
         } else {
             // 加载失败
-            loadStateImageView.setVisibility(View.VISIBLE);
             loadStateTextView.setText(R.string.load_fail);
-            loadStateImageView.setBackgroundResource(R.mipmap.icon_load_failed);
+            Drawable drawable = getResources().getDrawable(R.mipmap.icon_load_failed);
+            loadStateTextView.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
         }
         if (pullUpY < 0) {
             // 刷新结果停留1秒
@@ -206,14 +203,14 @@ public class PullToRefreshLayout extends RelativeLayout {
         state = to;
         switch (state) {
             case INIT: // 下拉布局初始状态
-                refreshStateImageView.setVisibility(View.GONE);
                 refreshStateTextView.setText(R.string.pull_to_refresh);
+                refreshStateTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                 refreshArrowImg.setVisibility(View.VISIBLE);
                 rotateArrow(refreshArrowImg);
 
                 // 上拉布局初始状态
-                loadStateImageView.setVisibility(View.GONE);
                 loadStateTextView.setText(R.string.pull_up_to_load);
+                loadStateTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                 loadArrowImg.setVisibility(View.VISIBLE);
                 rotateArrow(loadArrowImg);
                 break;
@@ -250,7 +247,7 @@ public class PullToRefreshLayout extends RelativeLayout {
             ObjectAnimator.ofFloat(imageView, "rotation", 0).setDuration(150).start();
         } else if (imageView == loadArrowImg && pullUpY == 0) { // 上拉箭头恢复最初状态
             ObjectAnimator.ofFloat(imageView, "rotation", 180).setDuration(150).start();
-        }else {
+        } else {
             ObjectAnimator.ofFloat(imageView, "rotation",
                     imageView.getRotation() + 180).setDuration(150).start();
         }

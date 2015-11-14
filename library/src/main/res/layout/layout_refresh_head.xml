@@ -38,14 +38,5 @@
             android:text="@string/pull_to_refresh"
             android:textColor="@color/refresh_text_color_gray"
             android:textSize="13sp"/>
-
-        <ImageView
-            android:id="@+id/head_state_img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="8dp"
-            android:layout_toLeftOf="@id/head_hint_text"
-            android:visibility="gone"/>
     </RelativeLayout>
 </RelativeLayout>
