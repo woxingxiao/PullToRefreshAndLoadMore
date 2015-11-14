@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-    android:id="@+id/head_layout"
+    android:id="@+id/foot_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -8,12 +8,12 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:paddingBottom="20dp"
         android:paddingTop="20dp">
 
         <ImageView
-            android:id="@+id/head_arrow_img"
+            android:id="@+id/foot_arrow_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -21,7 +21,7 @@
             android:src="@mipmap/icon_refresh_arrow"/>
 
         <ProgressBar
-            android:id="@+id/head_progress_bar"
+            android:id="@+id/foot_progress_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -31,21 +31,21 @@
             android:visibility="gone"/>
 
         <TextView
-            android:id="@+id/head_hint_text"
+            android:id="@+id/foot_hint_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="@string/pull_to_refresh"
+            android:text="@string/pull_up_to_load"
             android:textColor="@color/refresh_text_color_gray"
             android:textSize="13sp"/>
 
         <ImageView
-            android:id="@+id/head_state_img"
+            android:id="@+id/foot_state_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginRight="8dp"
-            android:layout_toLeftOf="@id/head_hint_text"
+            android:layout_toLeftOf="@id/foot_hint_text"
             android:visibility="gone"/>
     </RelativeLayout>
 </RelativeLayout>

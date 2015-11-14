@@ -1,16 +1,16 @@
 package com.repo.xw.library.views;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -22,139 +22,46 @@ import java.util.TimerTask;
 
 public class PullToRefreshLayout extends RelativeLayout {
 
-    public static final String TAG = "PullToRefreshLayout";
-    // 初始状态
-    public static final int INIT = 0;
-    // 释放刷新
-    public static final int RELEASE_TO_REFRESH = 1;
-    // 正在刷新
-    public static final int REFRESHING = 2;
-    // 释放加载
-    public static final int RELEASE_TO_LOAD = 3;
-    // 正在加载
-    public static final int LOADING = 4;
-    // 操作完毕
-    public static final int DONE = 5;
-    // 当前状态
-    private int state = INIT;
-    // 刷新回调接口
-    private OnRefreshListener mListener;
-    // 刷新成功
-    public static final int SUCCEED = 0;
-    // 刷新失败
-    public static final int FAIL = 1;
-    // 按下Y坐标，上一个事件点Y坐标
-    private float downY, lastY;
+    //    public static final String TAG = "PullToRefreshLayout";
+    public static final int INIT = 0; // 初始状态
+    public static final int RELEASE_TO_REFRESH = 1; // 释放刷新
+    public static final int REFRESHING = 2; // 正在刷新
+    public static final int RELEASE_TO_LOAD = 3; // 释放加载
+    public static final int LOADING = 4; // 正在加载
+    public static final int DONE = 5; // 操作完毕
 
-    // 下拉的距离。注意：pullDownY和pullUpY不可能同时不为0
-    public float pullDownY = 0;
-    // 上拉的距离
-    private float pullUpY = 0;
+    private int state = INIT;// 当前状态
+    private float lastY; // 按下Y坐标，上一个事件点Y坐标
+    public float pullDownY = 0; // 下拉的距离。注意：pullDownY和pullUpY不可能同时不为0
+    private float pullUpY = 0; // 上拉的距离
+    private float refreshDist = 200; // 释放刷新的距离
+    private float loadMoreDist = 200; // 释放加载的距离
 
-    // 释放刷新的距离
-    private float refreshDist = 200;
-    // 释放加载的距离
-    private float loadmoreDist = 200;
+    private MyTimer timer; // 计时器
+    public float MOVE_SPEED = 8; // 回滚速度
+    private boolean isLayout = false; // 第一次执行布局
+    private boolean isTouch = false;  // 在刷新过程中滑动操作
+    private float radio = 2; // 手指滑动距离与下拉头的滑动距离比，中间会随正切函数变化
 
-    private MyTimer timer;
-    // 回滚速度
-    public float MOVE_SPEED = 8;
-    // 第一次执行布局
-    private boolean isLayout = false;
-    // 在刷新过程中滑动操作
-    private boolean isTouch = false;
-    // 手指滑动距离与下拉头的滑动距离比，中间会随正切函数变化
-    private float radio = 2;
+    //    private RotateAnimation rotateAnimation; // 下拉箭头的转180°动画
+    private View refreshView; // 下拉头
+    private ImageView refreshArrowImg;    // 下拉的箭头
+    private ProgressBar refreshingBar;     // 正在刷新的图标
+    private View refreshStateImageView;    // 刷新结果图标
+    private TextView refreshStateTextView;    // 刷新结果：成功或失败
+    private View loadMoreView;    // 上拉头
+    private ImageView loadArrowImg;    // 上拉的箭头
+    private ProgressBar loadingBar;    // 正在加载的图标
+    private View loadStateImageView;    // 加载结果图标
+    private TextView loadStateTextView;    // 加载结果：成功或失败
 
-    // 下拉箭头的转180°动画
-    private RotateAnimation rotateAnimation;
-    // 均匀旋转动画
-    private RotateAnimation refreshingAnimation;
+    private View pullableView;    // 实现了Pullable接口的View
+    private int mEvents;    // 过滤多点触碰
+    private OnRefreshListener mOnRefreshListener; // 刷新回调接口
 
-    // 下拉头
-    private View refreshView;
-    // 下拉的箭头
-    private View pullView;
-    // 正在刷新的图标
-//    private View refreshingView;
-    private ProgressBar refreshingBar;
-    // 刷新结果图标
-    private View refreshStateImageView;
-    // 刷新结果：成功或失败
-    private TextView refreshStateTextView;
-
-    // 上拉头
-    private View loadmoreView;
-    // 上拉的箭头
-    private View pullUpView;
-    // 正在加载的图标
-    private View loadingView;
-    // 加载结果图标
-    private View loadStateImageView;
-    // 加载结果：成功或失败
-    private TextView loadStateTextView;
-
-    // 实现了Pullable接口的View
-    private View pullableView;
-    // 过滤多点触碰
-    private int mEvents;
     // 这两个变量用来控制pull的方向，如果不加控制，当情况满足可上拉又可下拉时没法下拉
     private boolean canPullDown = true;
     private boolean canPullUp = true;
-
-
-    /**
-     * 执行自动回滚的handler
-     */
-    private class UpdateHandler extends Handler {
-
-        @Override
-        public void handleMessage(Message msg) {
-            // 回弹速度随下拉距离moveDeltaY增大而增大
-            MOVE_SPEED = (float) (8 + 5 * Math.tan(Math.PI / 2
-                    / getMeasuredHeight() * (pullDownY + Math.abs(pullUpY))));
-            if (!isTouch) {
-                // 正在刷新，且没有往上推的话则悬停，显示"正在刷新..."
-                if (state == REFRESHING && pullDownY <= refreshDist) {
-                    pullDownY = refreshDist;
-                    timer.cancel();
-                } else if (state == LOADING && -pullUpY <= loadmoreDist) {
-                    pullUpY = -loadmoreDist;
-                    timer.cancel();
-                }
-
-            }
-            if (pullDownY > 0)
-                pullDownY -= MOVE_SPEED;
-            else if (pullUpY < 0)
-                pullUpY += MOVE_SPEED;
-            if (pullDownY < 0) {
-                // 已完成回弹
-                pullDownY = 0;
-                pullView.clearAnimation();
-                // 隐藏下拉头时有可能还在刷新，只有当前状态不是正在刷新时才改变状态
-                if (state != REFRESHING && state != LOADING)
-                    changeState(INIT);
-                timer.cancel();
-                requestLayout();
-            }
-            if (pullUpY > 0) {
-                // 已完成回弹
-                pullUpY = 0;
-                pullUpView.clearAnimation();
-                // 隐藏上拉头时有可能还在刷新，只有当前状态不是正在刷新时才改变状态
-                if (state != REFRESHING && state != LOADING)
-                    changeState(INIT);
-                timer.cancel();
-                requestLayout();
-            }
-            // 刷新布局,会自动调用onLayout
-            requestLayout();
-            // 没有拖拉或者回弹完成
-            if (pullDownY + Math.abs(pullUpY) == 0)
-                timer.cancel();
-        }
-    }
 
     public PullToRefreshLayout(Context context) {
         super(context);
@@ -173,28 +80,22 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void initView(Context context) {
         timer = new MyTimer(new UpdateHandler());
-        rotateAnimation = (RotateAnimation) AnimationUtils.loadAnimation(
-                context, R.anim.reverse_anim);
-        refreshingAnimation = (RotateAnimation) AnimationUtils.loadAnimation(
-                context, R.anim.rotating);
-        // 添加匀速转动动画
-        LinearInterpolator lir = new LinearInterpolator();
-        rotateAnimation.setInterpolator(lir);
-        refreshingAnimation.setInterpolator(lir);
+        refreshView = LayoutInflater.from(context).inflate(R.layout.layout_refresh_head, this, false);
+        loadMoreView = LayoutInflater.from(context).inflate(R.layout.layout_load_foot, this, false);
+        addView(refreshView);
+        addView(loadMoreView);
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        refreshView = getChildAt(0);
-        pullableView = getChildAt(1);
-        loadmoreView = getChildAt(2);
         // 这里是第一次进来的时候做一些初始化
         if (!isLayout) {
             isLayout = true;
+            pullableView = getChildAt(2);
             initView();
         }
         refreshDist = ((ViewGroup) refreshView).getChildAt(0).getMeasuredHeight();
-        loadmoreDist = ((ViewGroup) loadmoreView).getChildAt(0).getMeasuredHeight();
+        loadMoreDist = ((ViewGroup) loadMoreView).getChildAt(0).getMeasuredHeight();
         // 改变子控件的布局，这里直接用(pullDownY + pullUpY)作为偏移量，这样就可以不对当前状态作区分
         refreshView.layout(0,
                 (int) (pullDownY + pullUpY) - refreshView.getMeasuredHeight(),
@@ -202,24 +103,25 @@ public class PullToRefreshLayout extends RelativeLayout {
         pullableView.layout(0, (int) (pullDownY + pullUpY),
                 pullableView.getMeasuredWidth(), (int) (pullDownY + pullUpY)
                         + pullableView.getMeasuredHeight());
-        loadmoreView.layout(0,
+        loadMoreView.layout(0,
                 (int) (pullDownY + pullUpY) + pullableView.getMeasuredHeight(),
-                loadmoreView.getMeasuredWidth(),
+                loadMoreView.getMeasuredWidth(),
                 (int) (pullDownY + pullUpY) + pullableView.getMeasuredHeight()
-                        + loadmoreView.getMeasuredHeight());
+                        + loadMoreView.getMeasuredHeight());
     }
 
     private void initView() {
         // 初始化下拉布局
-        pullView = refreshView.findViewById(R.id.pull_icon);
-        refreshStateTextView = (TextView) refreshView.findViewById(R.id.state_tv);
-        refreshingBar = (ProgressBar) refreshView.findViewById(R.id.refreshing_bar);
-        refreshStateImageView = refreshView.findViewById(R.id.state_iv);
+        refreshArrowImg = (ImageView) refreshView.findViewById(R.id.head_arrow_img);
+        refreshStateTextView = (TextView) refreshView.findViewById(R.id.head_hint_text);
+        refreshingBar = (ProgressBar) refreshView.findViewById(R.id.head_progress_bar);
+        refreshStateImageView = refreshView.findViewById(R.id.head_state_img);
         // 初始化上拉布局
-        pullUpView = loadmoreView.findViewById(R.id.pullup_icon);
-        loadStateTextView = (TextView) loadmoreView.findViewById(R.id.loadstate_tv);
-        loadingView = loadmoreView.findViewById(R.id.loading_icon);
-        loadStateImageView = loadmoreView.findViewById(R.id.loadstate_iv);
+        loadArrowImg = (ImageView) loadMoreView.findViewById(R.id.foot_arrow_img);
+        rotateArrow(loadArrowImg);
+        loadStateTextView = (TextView) loadMoreView.findViewById(R.id.foot_hint_text);
+        loadingBar = (ProgressBar) loadMoreView.findViewById(R.id.foot_progress_bar);
+        loadStateImageView = loadMoreView.findViewById(R.id.foot_state_img);
     }
 
     private void hide() {
@@ -229,27 +131,24 @@ public class PullToRefreshLayout extends RelativeLayout {
     /**
      * 完成刷新操作，显示刷新结果。注意：刷新完成后一定要调用这个方法
      *
-     * @param refreshResult PullToRefreshLayout.SUCCEED代表成功，PullToRefreshLayout.FAIL代表失败
+     * @param isSuccess true成功，false失败
      */
-    public void refreshFinish(int refreshResult) {
+    public void refreshFinish(boolean isSuccess) {
         if (refreshingBar == null || refreshStateImageView == null || refreshStateTextView == null)
             return;
+        refreshingBar.clearAnimation();
         refreshingBar.setVisibility(View.GONE);
 
-        switch (refreshResult) {
-            case SUCCEED:
-                // 刷新成功
-                refreshStateImageView.setVisibility(View.VISIBLE);
-                refreshStateTextView.setText(R.string.refresh_succeed);
-                refreshStateImageView.setBackgroundResource(R.mipmap.icon_refresh_succeed);
-                break;
-            case FAIL:
-            default:
-                // 刷新失败
-                refreshStateImageView.setVisibility(View.VISIBLE);
-                refreshStateTextView.setText(R.string.refresh_fail);
-                refreshStateImageView.setBackgroundResource(R.mipmap.icon_refresh_failed);
-                break;
+        if (isSuccess) {
+            // 刷新成功
+            refreshStateImageView.setVisibility(View.VISIBLE);
+            refreshStateTextView.setText(R.string.refresh_succeed);
+            refreshStateImageView.setBackgroundResource(R.mipmap.icon_refresh_succeed);
+        } else {
+            // 刷新失败
+            refreshStateImageView.setVisibility(View.VISIBLE);
+            refreshStateTextView.setText(R.string.refresh_fail);
+            refreshStateImageView.setBackgroundResource(R.mipmap.icon_refresh_failed);
         }
         if (pullDownY > 0) {
             // 刷新结果停留1秒
@@ -269,28 +168,24 @@ public class PullToRefreshLayout extends RelativeLayout {
     /**
      * 加载完毕，显示加载结果。注意：加载完成后一定要调用这个方法
      *
-     * @param refreshResult PullToRefreshLayout.SUCCEED代表成功，PullToRefreshLayout.FAIL代表失败
+     * @param isSuccess true成功，false代表失败
      */
-    public void loadMoreFinish(int refreshResult) {
-        if (loadingView == null || loadStateImageView == null || loadStateTextView == null)
+    public void loadMoreFinish(boolean isSuccess) {
+        if (loadingBar == null || loadStateImageView == null || loadStateTextView == null)
             return;
-        loadingView.clearAnimation();
-        loadingView.setVisibility(View.GONE);
+        loadingBar.clearAnimation();
+        loadingBar.setVisibility(View.GONE);
 
-        switch (refreshResult) {
-            case SUCCEED:
-                // 加载成功
-                loadStateImageView.setVisibility(View.VISIBLE);
-                loadStateTextView.setText(R.string.load_succeed);
-                loadStateImageView.setBackgroundResource(R.mipmap.icon_load_succeed);
-                break;
-            case FAIL:
-            default:
-                // 加载失败
-                loadStateImageView.setVisibility(View.VISIBLE);
-                loadStateTextView.setText(R.string.load_fail);
-                loadStateImageView.setBackgroundResource(R.mipmap.icon_load_failed);
-                break;
+        if (isSuccess) {
+            // 加载成功
+            loadStateImageView.setVisibility(View.VISIBLE);
+            loadStateTextView.setText(R.string.load_succeed);
+            loadStateImageView.setBackgroundResource(R.mipmap.icon_load_succeed);
+        } else {
+            // 加载失败
+            loadStateImageView.setVisibility(View.VISIBLE);
+            loadStateTextView.setText(R.string.load_fail);
+            loadStateImageView.setBackgroundResource(R.mipmap.icon_load_failed);
         }
         if (pullUpY < 0) {
             // 刷新结果停留1秒
@@ -310,46 +205,54 @@ public class PullToRefreshLayout extends RelativeLayout {
     private void changeState(int to) {
         state = to;
         switch (state) {
-            case INIT:
-                // 下拉布局初始状态
+            case INIT: // 下拉布局初始状态
                 refreshStateImageView.setVisibility(View.GONE);
                 refreshStateTextView.setText(R.string.pull_to_refresh);
-                pullView.clearAnimation();
-                pullView.setVisibility(View.VISIBLE);
+                refreshArrowImg.setVisibility(View.VISIBLE);
+                rotateArrow(refreshArrowImg);
+
                 // 上拉布局初始状态
                 loadStateImageView.setVisibility(View.GONE);
                 loadStateTextView.setText(R.string.pull_up_to_load);
-                pullUpView.clearAnimation();
-                pullUpView.setVisibility(View.VISIBLE);
+                loadArrowImg.setVisibility(View.VISIBLE);
+                rotateArrow(loadArrowImg);
                 break;
-            case RELEASE_TO_REFRESH:
-                // 释放刷新状态
+            case RELEASE_TO_REFRESH: // 释放刷新状态
                 refreshStateTextView.setText(R.string.release_to_refresh);
-                pullView.startAnimation(rotateAnimation);
+                rotateArrow(refreshArrowImg);
                 break;
-            case REFRESHING:
-                // 正在刷新状态
-                pullView.clearAnimation();
+            case REFRESHING: // 正在刷新状态
+                refreshArrowImg.clearAnimation();
                 refreshingBar.setVisibility(View.VISIBLE);
-                pullView.setVisibility(View.INVISIBLE);
+                refreshArrowImg.setVisibility(View.INVISIBLE);
                 refreshStateTextView.setText(R.string.refreshing);
                 break;
-            case RELEASE_TO_LOAD:
-                // 释放加载状态
+            case RELEASE_TO_LOAD: // 释放加载状态
                 loadStateTextView.setText(R.string.release_to_load);
-                pullUpView.startAnimation(rotateAnimation);
+                rotateArrow(loadArrowImg);
                 break;
-            case LOADING:
-                // 正在加载状态
-                pullUpView.clearAnimation();
-                loadingView.setVisibility(View.VISIBLE);
-                pullUpView.setVisibility(View.INVISIBLE);
-                loadingView.startAnimation(refreshingAnimation);
+            case LOADING: // 正在加载状态
+                loadArrowImg.clearAnimation();
+                loadingBar.setVisibility(View.VISIBLE);
+                loadArrowImg.setVisibility(View.INVISIBLE);
                 loadStateTextView.setText(R.string.loading);
                 break;
-            case DONE:
-                // 刷新或加载完毕，啥都不做
+            case DONE: // 刷新或加载完毕，do nothing
                 break;
+        }
+    }
+
+    /**
+     * 利用属性动画旋转箭头
+     */
+    private void rotateArrow(ImageView imageView) {
+        if (imageView == refreshArrowImg && pullDownY == 0) { // 下拉箭头恢复最初状态
+            ObjectAnimator.ofFloat(imageView, "rotation", 0).setDuration(150).start();
+        } else if (imageView == loadArrowImg && pullUpY == 0) { // 上拉箭头恢复最初状态
+            ObjectAnimator.ofFloat(imageView, "rotation", 180).setDuration(150).start();
+        }else {
+            ObjectAnimator.ofFloat(imageView, "rotation",
+                    imageView.getRotation() + 180).setDuration(150).start();
         }
     }
 
@@ -362,8 +265,7 @@ public class PullToRefreshLayout extends RelativeLayout {
     public boolean dispatchTouchEvent(MotionEvent ev) {
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                downY = ev.getY();
-                lastY = downY;
+                lastY = ev.getY();
                 timer.cancel();
                 mEvents = 0;
                 releasePull();
@@ -386,8 +288,9 @@ public class PullToRefreshLayout extends RelativeLayout {
                             canPullDown = false;
                             canPullUp = true;
                         }
-                        if (pullDownY > getMeasuredHeight())
+                        if (pullDownY > getMeasuredHeight()) {
                             pullDownY = getMeasuredHeight();
+                        }
                         if (state == REFRESHING) {
                             // 正在刷新的时候触摸移动
                             isTouch = true;
@@ -401,22 +304,27 @@ public class PullToRefreshLayout extends RelativeLayout {
                             canPullDown = true;
                             canPullUp = false;
                         }
-                        if (pullUpY < -getMeasuredHeight())
+                        if (pullUpY < -getMeasuredHeight()) {
                             pullUpY = -getMeasuredHeight();
+                        }
                         if (state == LOADING) {
                             // 正在加载的时候触摸移动
                             isTouch = true;
                         }
-                    } else
+                    } else {
                         releasePull();
-                } else
+                    }
+                } else {
                     mEvents = 0;
+                }
+
                 lastY = ev.getY();
                 // 根据下拉距离改变比例
                 radio = (float) (2 + 2 * Math.tan(Math.PI / 2 / getMeasuredHeight()
                         * (pullDownY + Math.abs(pullUpY))));
-                if (pullDownY > 0 || pullUpY < 0)
+                if (pullDownY > 0 || pullUpY < 0) {
                     requestLayout();
+                }
                 if (pullDownY > 0) {
                     if (pullDownY <= refreshDist
                             && (state == RELEASE_TO_REFRESH || state == DONE)) {
@@ -429,12 +337,12 @@ public class PullToRefreshLayout extends RelativeLayout {
                     }
                 } else if (pullUpY < 0) {
                     // 下面是判断上拉加载的，同上，注意pullUpY是负值
-                    if (-pullUpY <= loadmoreDist
+                    if (-pullUpY <= loadMoreDist
                             && (state == RELEASE_TO_LOAD || state == DONE)) {
                         changeState(INIT);
                     }
                     // 上拉操作
-                    if (-pullUpY >= loadmoreDist && state == INIT) {
+                    if (-pullUpY >= loadMoreDist && state == INIT) {
                         changeState(RELEASE_TO_LOAD);
                     }
 
@@ -447,7 +355,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (pullDownY > refreshDist || -pullUpY > loadmoreDist)
+                if (pullDownY > refreshDist || -pullUpY > loadMoreDist)
                 // 正在刷新时往下拉（正在加载时往上拉），释放后下拉头（上拉头）不隐藏
                 {
                     isTouch = false;
@@ -455,13 +363,13 @@ public class PullToRefreshLayout extends RelativeLayout {
                 if (state == RELEASE_TO_REFRESH) {
                     changeState(REFRESHING);
                     // 刷新操作
-                    if (mListener != null)
-                        mListener.onRefresh(this);
+                    if (mOnRefreshListener != null)
+                        mOnRefreshListener.onRefresh(this);
                 } else if (state == RELEASE_TO_LOAD) {
                     changeState(LOADING);
                     // 加载操作
-                    if (mListener != null)
-                        mListener.onLoadMore(this);
+                    if (mOnRefreshListener != null)
+                        mOnRefreshListener.onLoadMore(this);
                 }
                 hide();
             default:
@@ -482,7 +390,60 @@ public class PullToRefreshLayout extends RelativeLayout {
     }
 
     /**
-     * @author chenjing 自动模拟手指滑动的task
+     * 执行自动回滚的handler
+     */
+    private class UpdateHandler extends Handler {
+
+        @Override
+        public void handleMessage(Message msg) {
+            // 回弹速度随下拉距离moveDeltaY增大而增大
+            MOVE_SPEED = (float) (8 + 5 * Math.tan(Math.PI / 2
+                    / getMeasuredHeight() * (pullDownY + Math.abs(pullUpY))));
+            if (!isTouch) {
+                // 正在刷新，且没有往上推的话则悬停，显示"正在刷新..."
+                if (state == REFRESHING && pullDownY <= refreshDist) {
+                    pullDownY = refreshDist;
+                    timer.cancel();
+                } else if (state == LOADING && -pullUpY <= loadMoreDist) {
+                    pullUpY = -loadMoreDist;
+                    timer.cancel();
+                }
+
+            }
+            if (pullDownY > 0)
+                pullDownY -= MOVE_SPEED;
+            else if (pullUpY < 0)
+                pullUpY += MOVE_SPEED;
+            if (pullDownY < 0) {
+                // 已完成回弹
+                pullDownY = 0;
+                refreshArrowImg.clearAnimation();
+                // 隐藏下拉头时有可能还在刷新，只有当前状态不是正在刷新时才改变状态
+                if (state != REFRESHING && state != LOADING)
+                    changeState(INIT);
+                timer.cancel();
+                requestLayout();
+            }
+            if (pullUpY > 0) {
+                // 已完成回弹
+                pullUpY = 0;
+                loadArrowImg.clearAnimation();
+                // 隐藏上拉头时有可能还在刷新，只有当前状态不是正在刷新时才改变状态
+                if (state != REFRESHING && state != LOADING)
+                    changeState(INIT);
+                timer.cancel();
+                requestLayout();
+            }
+            // 刷新布局,会自动调用onLayout
+            requestLayout();
+            // 没有拖拉或者回弹完成
+            if (pullDownY + Math.abs(pullUpY) == 0)
+                timer.cancel();
+        }
+    }
+
+    /**
+     * 自动模拟手指滑动的task
      */
     private class AutoRefreshAndLoadTask extends AsyncTask<Integer, Float, String> {
 
@@ -504,8 +465,8 @@ public class PullToRefreshLayout extends RelativeLayout {
         protected void onPostExecute(String result) {
             changeState(REFRESHING);
             // 刷新操作
-            if (mListener != null)
-                mListener.onRefresh(PullToRefreshLayout.this);
+            if (mOnRefreshListener != null)
+                mOnRefreshListener.onRefresh(PullToRefreshLayout.this);
             hide();
         }
 
@@ -530,12 +491,12 @@ public class PullToRefreshLayout extends RelativeLayout {
      * 自动加载
      */
     public void autoLoad() {
-        pullUpY = -loadmoreDist;
+        pullUpY = -loadMoreDist;
         requestLayout();
         changeState(LOADING);
         // 加载操作
-        if (mListener != null)
-            mListener.onLoadMore(this);
+        if (mOnRefreshListener != null)
+            mOnRefreshListener.onLoadMore(this);
     }
 
     class MyTimer {
@@ -580,22 +541,20 @@ public class PullToRefreshLayout extends RelativeLayout {
     }
 
     public void setOnRefreshListener(OnRefreshListener listener) {
-        mListener = listener;
+        mOnRefreshListener = listener;
     }
 
     /**
-     * 刷新加载回调接口
-     *
-     * @author chenjing
+     * 刷新回调接口
      */
     public interface OnRefreshListener {
         /**
-         * 刷新操作
+         * 下拉刷新
          */
         void onRefresh(PullToRefreshLayout pullToRefreshLayout);
 
         /**
-         * 加载操作
+         * 上拉加载
          */
         void onLoadMore(PullToRefreshLayout pullToRefreshLayout);
     }
