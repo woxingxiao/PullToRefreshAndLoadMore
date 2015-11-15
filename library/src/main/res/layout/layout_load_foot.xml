@@ -5,35 +5,37 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/foot_arrow_img"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="60dp"
-        android:paddingBottom="12dp"
-        android:paddingTop="12dp"
-        android:src="@mipmap/icon_refresh_arrow"/>
-
-    <ProgressBar
-        android:id="@+id/foot_progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="60dp"
-        android:indeterminate="false"
-        android:indeterminateDrawable="@anim/refresh_loading"
-        android:visibility="gone"/>
-
-    <TextView
-        android:id="@+id/foot_hint_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:paddingBottom="20dp"
-        android:paddingTop="20dp"
-        android:text="@string/pull_up_to_load"
-        android:textColor="@color/refresh_text_color_gray"
-        android:textSize="13sp"/>
+        android:paddingTop="20dp">
+
+        <ImageView
+            android:id="@+id/foot_arrow_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="60dp"
+            android:src="@mipmap/icon_arrow"/>
+
+        <ProgressBar
+            android:id="@+id/foot_progress_bar"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="65dp"
+            android:indeterminate="false"
+            android:indeterminateDrawable="@anim/anim_refresh_loading"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/foot_hint_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/pull_up_to_load"
+            android:textColor="@color/refresh_text_color_gray"
+            android:textSize="13sp"/>
+    </RelativeLayout>
 </RelativeLayout>
