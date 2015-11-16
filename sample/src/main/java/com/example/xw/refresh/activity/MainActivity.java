@@ -1,4 +1,4 @@
-package com.example.xw.refresh.activitity;
+package com.example.xw.refresh.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.layout_pull_to_refresh_list_view);
 
         mRefreshLayout = (PullToRefreshLayout) findViewById(R.id.pullToRefreshLayout);
         mPullListView = (PullListView) findViewById(R.id.pullListView);
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
         for (int i = 0; i < 5; i++) {
             mStrings.add("normal item " + i);
         }
-        mAdapter = new ListAdapter(this, 0, mStrings);
+        mAdapter = new ListAdapter(this,  mStrings);
         mPullListView.setAdapter(mAdapter);
         mRefreshLayout.setOnRefreshListener(this);
     }
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
                 mRefreshLayout.refreshFinish(true);
                 mStrings.add("pull down item " + mStrings.size());
                 mStrings.add("pull down item " + mStrings.size());
-                mAdapter.updateData(mStrings);
+                mAdapter.updateListView(mStrings);
             }
         }, 2000);
     }
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
                 mRefreshLayout.loadMoreFinish(true);
                 mStrings.add("pull up item " + mStrings.size());
                 mStrings.add("pull up item " + mStrings.size());
-                mAdapter.updateData(mStrings);
+                mAdapter.updateListView(mStrings);
             }
         }, 2000);
     }
