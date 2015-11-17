@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -103,7 +102,6 @@ public class PullToRefreshLayout extends RelativeLayout {
         refreshView.layout(0,
                 (int) (pullDownY + pullUpY) - refreshView.getMeasuredHeight(),
                 refreshView.getMeasuredWidth(), (int) (pullDownY + pullUpY));
-        Log.i("", this.getChildCount() + "");
         mPullableView.layout(0, (int) (pullDownY + pullUpY),
                 mPullableView.getMeasuredWidth(), (int) (pullDownY + pullUpY)
                         + mPullableView.getMeasuredHeight());
