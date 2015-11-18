@@ -1,10 +1,15 @@
 package com.example.xw.refresh.activity;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.xw.refresh.R;
 import com.example.xw.refresh.adapter.ListAdapter;
+import com.example.xw.refresh.bean.ListData;
+import com.example.xw.refresh.server.ServerRequest;
 import com.repo.xw.library.views.PullListView;
 import com.repo.xw.library.views.PullToRefreshLayout;
 
@@ -16,8 +21,9 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
     private PullToRefreshLayout mRefreshLayout;
     private PullListView mPullListView;
 
-    private List<String> mStrings;
+    private List<ListData> mDataList;
     private ListAdapter mAdapter;
+    private MyHandler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,38 +32,51 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
 
         mRefreshLayout = (PullToRefreshLayout) findViewById(R.id.pullToRefreshLayout);
         mPullListView = (PullListView) findViewById(R.id.pullListView);
-        mStrings = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            mStrings.add("normal item " + i);
-        }
-        mAdapter = new ListAdapter(this,  mStrings);
-        mPullListView.setAdapter(mAdapter);
+        mDataList = new ArrayList<>();
         mRefreshLayout.setOnRefreshListener(this);
+        mHandler = new MyHandler();
     }
 
     @Override
     public void onRefresh(PullToRefreshLayout pullToRefreshLayout) {
-        mPullListView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mRefreshLayout.refreshFinish(true);
-                mStrings.add("pull down item " + mStrings.size());
-                mStrings.add("pull down item " + mStrings.size());
-                mAdapter.updateListView(mStrings);
-            }
-        }, 2000);
+        new LoadDataTask().execute();
     }
 
     @Override
     public void onLoadMore(PullToRefreshLayout pullToRefreshLayout) {
-        mPullListView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mRefreshLayout.loadMoreFinish(true);
-                mStrings.add("pull up item " + mStrings.size());
-                mStrings.add("pull up item " + mStrings.size());
-                mAdapter.updateListView(mStrings);
+    }
+
+    private class LoadDataTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mDataList = ServerRequest.getInstance(mHandler)
+                    .loadDataList("http://gank.avosapps.com/api/data/福利/10/1");
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            mRefreshLayout.refreshFinish(true);
+            if (mDataList == null || mDataList.isEmpty())
+                return;
+
+            if (mAdapter == null) {
+                mAdapter = new ListAdapter(MainActivity.this, mDataList);
+                mPullListView.setAdapter(mAdapter);
+            } else {
+                mAdapter.updateListView(mDataList);
             }
-        }, 2000);
+        }
+    }
+
+    private class MyHandler extends Handler {
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+        }
     }
 }

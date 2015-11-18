@@ -5,11 +5,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.example.xw.refresh.bean.ListData;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+import com.squareup.picasso.Request;
 
 import java.io.IOException;
 import java.util.List;
