@@ -49,12 +49,10 @@ public class PullToRefreshLayout extends RelativeLayout {
     private ImageView refreshArrowImg;    // 下拉的箭头
     private ProgressBar refreshingBar;     // 正在刷新的图标
     private TextView refreshHintText;    // 刷新提示文字
-    private ImageView refreshBackground; // 下拉头背景
     private View loadMoreView;    // 上拉头
     private ImageView loadArrowImg;    // 上拉的箭头
     private ProgressBar loadingBar;    // 正在加载的图标
     private TextView loadHintText;    // 加载提示文字
-    private ImageView loadBackground; // 上拉头背景
 
     private View mPullableView;    // 实现了Pullable接口的View
     private int mEvents;    // 过滤多点触碰
@@ -86,8 +84,6 @@ public class PullToRefreshLayout extends RelativeLayout {
         loadMoreView = LayoutInflater.from(context).inflate(R.layout.layout_load_foot, this, false);
         addView(refreshView);
         addView(loadMoreView);
-        refreshBackground = (ImageView) refreshView.findViewById(R.id.head_background);
-        loadBackground = (ImageView) loadMoreView.findViewById(R.id.foot_background);
     }
 
     @Override
@@ -104,7 +100,7 @@ public class PullToRefreshLayout extends RelativeLayout {
         loadMoreDist = ((ViewGroup) loadMoreView).getChildAt(0).getMeasuredHeight();
         // 改变子控件的布局，这里直接用(pullDownY + pullUpY)作为偏移量，这样就可以不对当前状态作区分
         refreshView.layout(0,
-                (int) (pullDownY + pullUpY) - refreshView.getMeasuredHeight(),
+                (int) (pullDownY + pullUpY) - refreshView.getMeasuredHeight() ,
                 refreshView.getMeasuredWidth(), (int) (pullDownY + pullUpY));
         mPullableView.layout(0, (int) (pullDownY + pullUpY),
                 mPullableView.getMeasuredWidth(), (int) (pullDownY + pullUpY)
@@ -513,38 +509,6 @@ public class PullToRefreshLayout extends RelativeLayout {
         // 加载操作
         if (mOnRefreshListener != null)
             mOnRefreshListener.onLoadMore(this);
-    }
-
-    /**
-     * 设置下拉头部背景
-     */
-    public void setRefreshHeaderBackground(int resId) {
-        if (resId != 0)
-            refreshBackground.setBackgroundResource(resId);
-    }
-
-    /**
-     * 设置下拉头部背景
-     */
-    public void setRefreshHeaderBackground(Drawable drawable) {
-        if (drawable != null)
-            refreshBackground.setBackgroundDrawable(drawable);
-    }
-
-    /**
-     * 设置上拉头部背景
-     */
-    public void setRefreshFooterBackground(int resId) {
-        if (resId != 0)
-            loadBackground.setBackgroundResource(resId);
-    }
-
-    /**
-     * 设置上拉头部背景
-     */
-    public void setRefreshFooterBackground(Drawable drawable) {
-        if (drawable != null)
-            loadBackground.setBackgroundDrawable(drawable);
     }
 
     /**

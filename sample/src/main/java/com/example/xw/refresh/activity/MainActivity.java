@@ -28,14 +28,38 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
         mPullListView = (PullListView) findViewById(R.id.pullListView);
         mStrings = new ArrayList<>();
         mRefreshLayout.setOnRefreshListener(this);
+
+        for (int i = 0; i < 5; i++) {
+            mStrings.add("normal item " + i);
+        }
+        mAdapter = new ListAdapter(this, mStrings);
+        mPullListView.setAdapter(mAdapter);
     }
 
     @Override
     public void onRefresh(PullToRefreshLayout pullToRefreshLayout) {
+        mRefreshLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mStrings.add("refresh item " + mStrings.size());
+                mStrings.add("refresh item " + (mStrings.size() + 1));
+                mAdapter.updateListView(mStrings);
+                mRefreshLayout.refreshFinish(true);
+            }
+        }, 2000); // 2秒后刷新
     }
 
     @Override
     public void onLoadMore(PullToRefreshLayout pullToRefreshLayout) {
+        mRefreshLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mStrings.add("load item " + mStrings.size());
+                mStrings.add("load item " + (mStrings.size() + 1));
+                mAdapter.updateListView(mStrings);
+                mRefreshLayout.loadMoreFinish(true);
+            }
+        }, 2000); // 2秒后刷新
     }
 
 }
