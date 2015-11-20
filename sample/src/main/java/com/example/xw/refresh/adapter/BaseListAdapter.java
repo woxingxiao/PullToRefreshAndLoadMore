@@ -34,13 +34,9 @@ public class BaseListAdapter<T> extends ArrayAdapter<T> {
             hasNoData = true;
     }
 
-    public void setNoData(boolean hasNoData) {
-        this.hasNoData = hasNoData;
-        notifyDataSetChanged();
-    }
-
     public void updateListView(List<T> dataList) {
         this.mDataList = dataList;
+        hasNoData = (this.mDataList == null || this.mDataList.isEmpty());
         notifyDataSetChanged();
     }
 

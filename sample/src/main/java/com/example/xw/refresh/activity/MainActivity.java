@@ -29,9 +29,6 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
         mStrings = new ArrayList<>();
         mRefreshLayout.setOnRefreshListener(this);
 
-        for (int i = 0; i < 5; i++) {
-            mStrings.add("normal item " + i);
-        }
         mAdapter = new ListAdapter(this, mStrings);
         mPullListView.setAdapter(mAdapter);
     }
@@ -42,9 +39,10 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
             @Override
             public void run() {
                 mStrings.add("refresh item " + mStrings.size());
-                mStrings.add("refresh item " + (mStrings.size() + 1));
-                mAdapter.updateListView(mStrings);
+                mStrings.add("refresh item " + (mStrings.size()));
+
                 mRefreshLayout.refreshFinish(true);
+                updateListData();
             }
         }, 2000); // 2秒后刷新
     }
@@ -55,11 +53,22 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
             @Override
             public void run() {
                 mStrings.add("load item " + mStrings.size());
-                mStrings.add("load item " + (mStrings.size() + 1));
-                mAdapter.updateListView(mStrings);
+                mStrings.add("load item " + (mStrings.size()));
+
                 mRefreshLayout.loadMoreFinish(true);
+                updateListData();
+
             }
         }, 2000); // 2秒后刷新
+    }
+
+    private void updateListData() {
+        if (mAdapter == null) {
+            mAdapter = new ListAdapter(this, mStrings);
+            mPullListView.setAdapter(mAdapter);
+        } else {
+            mAdapter.updateListView(mStrings);
+        }
     }
 
 }
