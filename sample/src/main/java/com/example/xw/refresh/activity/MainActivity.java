@@ -8,8 +8,8 @@ import android.view.MenuItem;
 
 import com.example.xw.refresh.R;
 import com.example.xw.refresh.adapter.ListAdapter;
-import com.repo.xw.library.views.PullListView;
-import com.repo.xw.library.views.PullToRefreshLayout;
+import com.xw.repo.refresh.PullListView;
+import com.xw.repo.refresh.PullToRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;

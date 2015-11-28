@@ -1,4 +1,4 @@
-package com.repo.xw.library.views;
+package com.xw.repo.refresh;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -17,7 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.repo.xw.library.R;
+import com.xw.repo.pulltorefresh.R;
 
 import java.util.Timer;
 import java.util.TimerTask;

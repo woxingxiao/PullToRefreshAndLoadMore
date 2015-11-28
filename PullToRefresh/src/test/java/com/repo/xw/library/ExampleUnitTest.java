@@ -1,4 +1,4 @@
-package com.repo.xw.library;
+package com.xw.repo.refresh;
 
 import org.junit.Test;
 

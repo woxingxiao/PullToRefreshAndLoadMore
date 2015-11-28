@@ -1,4 +1,4 @@
-package com.repo.xw.library.views;
+package com.xw.repo.refresh;
 
 public interface Pullable {
     /**

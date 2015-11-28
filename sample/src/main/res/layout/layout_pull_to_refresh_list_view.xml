@@ -16,12 +16,12 @@
 
     </android.support.v7.widget.Toolbar>
 
-    <com.repo.xw.library.views.PullToRefreshLayout
+    <com.xw.repo.refresh.PullToRefreshLayout
         android:id="@+id/pullToRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.repo.xw.library.views.PullListView
+        <com.xw.repo.refresh.PullListView
             android:id="@+id/pullListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -30,6 +30,6 @@
             android:overScrollMode="never"
             android:scrollingCache="false">
 
-        </com.repo.xw.library.views.PullListView>
-    </com.repo.xw.library.views.PullToRefreshLayout>
+        </com.xw.repo.refresh.PullListView>
+    </com.xw.repo.refresh.PullToRefreshLayout>
 </LinearLayout>
