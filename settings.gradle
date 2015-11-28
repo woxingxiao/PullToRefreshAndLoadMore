@@ -1,1 +1,1 @@
-include ':sample', ':PullToRefreshAndLoadMore'
+include ':sample', ':PullToRefresh'
