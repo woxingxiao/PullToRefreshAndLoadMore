@@ -2,6 +2,9 @@ package com.example.xw.refresh.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.example.xw.refresh.R;
 import com.example.xw.refresh.adapter.ListAdapter;
@@ -11,7 +14,8 @@ import com.repo.xw.library.views.PullToRefreshLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements PullToRefreshLayout.OnRefreshListener {
+public class MainActivity extends AppCompatActivity implements
+        PullToRefreshLayout.OnRefreshListener, Toolbar.OnMenuItemClickListener {
 
     private PullToRefreshLayout mRefreshLayout;
     private PullListView mPullListView;
@@ -23,15 +27,15 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_pull_to_refresh_list_view);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         mRefreshLayout = (PullToRefreshLayout) findViewById(R.id.pullToRefreshLayout);
         mPullListView = (PullListView) findViewById(R.id.pullListView);
         mStrings = new ArrayList<>();
+        toolbar.setOnMenuItemClickListener(this);
         mRefreshLayout.setOnRefreshListener(this);
 
-        for (int i = 0; i < 5; i++) {
-            mStrings.add("normal item " + i);
-        }
         mAdapter = new ListAdapter(this, mStrings);
         mPullListView.setAdapter(mAdapter);
     }
@@ -42,9 +46,10 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
             @Override
             public void run() {
                 mStrings.add("refresh item " + mStrings.size());
-                mStrings.add("refresh item " + (mStrings.size() + 1));
-                mAdapter.updateListView(mStrings);
+                mStrings.add("refresh item " + (mStrings.size()));
+
                 mRefreshLayout.refreshFinish(true);
+                updateListData();
             }
         }, 2000); // 2秒后刷新
     }
@@ -55,11 +60,40 @@ public class MainActivity extends AppCompatActivity implements PullToRefreshLayo
             @Override
             public void run() {
                 mStrings.add("load item " + mStrings.size());
-                mStrings.add("load item " + (mStrings.size() + 1));
-                mAdapter.updateListView(mStrings);
+                mStrings.add("load item " + (mStrings.size()));
+
                 mRefreshLayout.loadMoreFinish(true);
+                updateListData();
+
             }
         }, 2000); // 2秒后刷新
     }
 
+    private void updateListData() {
+        if (mAdapter == null) {
+            mAdapter = new ListAdapter(this, mStrings);
+            mPullListView.setAdapter(mAdapter);
+        } else {
+            mAdapter.updateListView(mStrings);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        if (item.getItemId() == R.id.action_clear) {
+            if (mStrings != null) {
+                mStrings.clear();
+                updateListData();
+
+                return true;
+            }
+        }
+        return false;
+    }
 }

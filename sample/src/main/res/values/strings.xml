@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">PullToRefreshAndLoadMore</string>
-    <string name="title_activity_recycler_view">RecyclerViewActivity</string>
+    <string name="has_no_data">没有内容，刷新一下吧~</string>
 </resources>
