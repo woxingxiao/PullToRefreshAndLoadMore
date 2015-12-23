@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -43,7 +44,7 @@ public class ListAdapter extends BaseListAdapter<String> {
         }
 
         if (hasNoData) {
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(getScreenWidth(), getScreenHeight() * 2 / 3);
+            AbsListView.LayoutParams lp = new AbsListView.LayoutParams(getScreenWidth(), getScreenHeight() * 2 / 3);
             holder.noDataRootLayout.setLayoutParams(lp);
         } else {
             holder.textView.setText(mDataList.get(position));
