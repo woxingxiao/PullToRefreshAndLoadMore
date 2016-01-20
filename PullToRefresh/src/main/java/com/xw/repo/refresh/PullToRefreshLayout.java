@@ -100,7 +100,7 @@ public class PullToRefreshLayout extends RelativeLayout {
         loadMoreDist = ((ViewGroup) loadMoreView).getChildAt(0).getMeasuredHeight();
         // 改变子控件的布局，这里直接用(pullDownY + pullUpY)作为偏移量，这样就可以不对当前状态作区分
         refreshView.layout(0,
-                (int) (pullDownY + pullUpY) - refreshView.getMeasuredHeight() ,
+                (int) (pullDownY + pullUpY) - refreshView.getMeasuredHeight(),
                 refreshView.getMeasuredWidth(), (int) (pullDownY + pullUpY));
         mPullableView.layout(0, (int) (pullDownY + pullUpY),
                 mPullableView.getMeasuredWidth(), (int) (pullDownY + pullUpY)
@@ -252,9 +252,16 @@ public class PullToRefreshLayout extends RelativeLayout {
             ObjectAnimator.ofFloat(imageView, "rotation", 0).setDuration(150).start();
         } else if (imageView == loadArrowImg && pullUpY == 0) { // 上拉箭头恢复最初状态
             ObjectAnimator.ofFloat(imageView, "rotation", 180).setDuration(150).start();
-        } else {
-            ObjectAnimator.ofFloat(imageView, "rotation",
-                    imageView.getRotation() + 180).setDuration(150).start();
+        } else { // 强行指向竖直方向
+            if (imageView.getRotation() % 180 != 0) {
+                if ((int) (imageView.getRotation() / 180) % 2 == 0) {
+                    ObjectAnimator.ofFloat(imageView, "rotation", 180).setDuration(150).start();
+                } else {
+                    ObjectAnimator.ofFloat(imageView, "rotation", 0).setDuration(150).start();
+                }
+            } else {
+                ObjectAnimator.ofFloat(imageView, "rotation", imageView.getRotation() + 180).setDuration(150).start();
+            }
         }
     }
 
