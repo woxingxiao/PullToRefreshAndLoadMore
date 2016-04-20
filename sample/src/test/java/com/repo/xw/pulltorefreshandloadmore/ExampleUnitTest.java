@@ -1,4 +1,4 @@
-package com.example.xw.refresh;
+package com.repo.xw.pulltorefreshandloadmore;
 
 import org.junit.Test;
 

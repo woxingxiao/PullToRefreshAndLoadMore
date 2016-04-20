@@ -24,7 +24,6 @@ import java.util.TimerTask;
 
 public class PullToRefreshLayout extends RelativeLayout {
 
-    //    public static final String TAG = "PullToRefreshLayout";
     public static final int INIT = 0; // 初始状态
     public static final int RELEASE_TO_REFRESH = 1; // 释放刷新
     public static final int REFRESHING = 2; // 正在刷新
@@ -137,7 +136,7 @@ public class PullToRefreshLayout extends RelativeLayout {
         if (refreshingBar == null || refreshHintText == null)
             return;
         refreshingBar.clearAnimation();
-        refreshingBar.setVisibility(View.GONE);
+        refreshingBar.setVisibility(View.INVISIBLE);
 
         if (showRefreshResultEnable) {
             if (isSuccess) { // 刷新成功
@@ -175,7 +174,7 @@ public class PullToRefreshLayout extends RelativeLayout {
         if (loadingBar == null || loadHintText == null)
             return;
         loadingBar.clearAnimation();
-        loadingBar.setVisibility(View.GONE);
+        loadingBar.setVisibility(View.INVISIBLE);
 
         if (showRefreshResultEnable) {
             if (isSuccess) { // 加载更多成功
