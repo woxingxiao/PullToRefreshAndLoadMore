@@ -38,6 +38,7 @@ public class PullToRefreshLayout extends RelativeLayout {
     private float refreshDist = 200; // 释放刷新的距离
     private float loadMoreDist = 200; // 释放加载的距离
 
+    private UpdateHandler mUpdateHandler;
     private MyTimer timer; // 计时器
     public float MOVE_SPEED = 8; // 回滚速度
     private boolean isFirstTimeCallOnLayout = true; // 第一次执行布局
@@ -78,7 +79,8 @@ public class PullToRefreshLayout extends RelativeLayout {
     }
 
     private void initView(Context context) {
-        timer = new MyTimer(new UpdateHandler());
+        mUpdateHandler = new UpdateHandler();
+        timer = new MyTimer(mUpdateHandler);
         refreshView = LayoutInflater.from(context).inflate(R.layout.layout_refresh_head, this, false);
         loadMoreView = LayoutInflater.from(context).inflate(R.layout.layout_load_foot, this, false);
         addView(refreshView);
@@ -529,6 +531,13 @@ public class PullToRefreshLayout extends RelativeLayout {
      */
     public View getRefreshFooterView() {
         return loadMoreView;
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mUpdateHandler.removeCallbacksAndMessages(null);
+        timer.cancel();
     }
 
     class MyTimer {
