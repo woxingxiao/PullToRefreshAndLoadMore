@@ -6,7 +6,7 @@
 ###Gradle
 ```groove
 dependencies{
-    compile 'com.xw.repo:PullToRefresh:1.0.3@aar'
+    compile 'com.xw.repo:PullToRefresh:1.1.0@aar'
 }
 ```
 
