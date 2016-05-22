@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-    android:id="@+id/foot_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -12,29 +11,29 @@
         android:paddingTop="20dp">
 
         <ImageView
-            android:id="@+id/foot_arrow_img"
+            android:id="@+id/foot_xw_ptr_arrow_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="60dp"
-            android:src="@mipmap/icon_arrow"/>
+            android:src="@mipmap/icon_xw_ptr_arrow"/>
 
         <ProgressBar
-            android:id="@+id/foot_progress_bar"
+            android:id="@+id/foot_xw_ptr_progress_bar"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="65dp"
             android:indeterminate="false"
-            android:indeterminateDrawable="@anim/anim_refresh_loading"
+            android:indeterminateDrawable="@anim/anim_xw_ptr_refresh_loading"
             android:visibility="gone"/>
 
         <TextView
-            android:id="@+id/foot_hint_text"
+            android:id="@+id/foot_xw_ptr_hint_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="@string/pull_up_to_load"
+            android:text="@string/xw_ptr_pull_up_to_load"
             android:textColor="@color/refresh_text_color_gray"
             android:textSize="13sp"/>
     </RelativeLayout>
