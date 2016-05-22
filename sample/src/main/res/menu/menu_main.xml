@@ -9,4 +9,10 @@
         android:orderInCategory="1"
         android:title=""
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_customize"
+        android:icon="@mipmap/ic_customize"
+        android:orderInCategory="1"
+        android:title="@string/customize_resources"
+        app:showAsAction="ifRoom"/>
 </menu>

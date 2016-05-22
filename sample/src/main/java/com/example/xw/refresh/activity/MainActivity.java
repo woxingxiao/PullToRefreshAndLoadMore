@@ -10,6 +10,7 @@ import com.example.xw.refresh.R;
 import com.example.xw.refresh.adapter.ListAdapter;
 import com.xw.repo.refresh.PullListView;
 import com.xw.repo.refresh.PullToRefreshLayout;
+import com.xw.repo.refresh.ResourceConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,9 @@ public class MainActivity extends AppCompatActivity implements
         mRefreshLayout = (PullToRefreshLayout) findViewById(R.id.pullToRefreshLayout);
         mPullListView = (PullListView) findViewById(R.id.pullListView);
         mStrings = new ArrayList<>();
-        toolbar.setOnMenuItemClickListener(this);
+        if (toolbar != null) {
+            toolbar.setOnMenuItemClickListener(this);
+        }
         mRefreshLayout.setOnRefreshListener(this);
 
         mAdapter = new ListAdapter(this, mStrings);
@@ -93,7 +96,28 @@ public class MainActivity extends AppCompatActivity implements
 
                 return true;
             }
+        } else if (item.getItemId() == R.id.action_customize) {
+            // customize here
+            ResourceConfig resourceConfig = new ResourceConfig() {
+                @Override
+                public int[] configImageResIds() {
+                    return new int[]{R.mipmap.ic_arrow, R.mipmap.ic_ok,
+                            R.mipmap.ic_failed, R.mipmap.ic_ok, R.mipmap.ic_failed};
+                }
+
+                @Override
+                public int[] configTextResIds() {
+                    return new int[]{R.string.pull_to_refresh, R.string.release_to_refresh, R.string.refreshing,
+                            R.string.refresh_succeeded, R.string.refresh_failed, R.string.pull_up_to_load,
+                            R.string.release_to_load, R.string.loading, R.string.load_succeeded,
+                            R.string.load_failed};
+                }
+            };
+            mRefreshLayout.setShowRefreshResultEnable(true);
+            mRefreshLayout.setResourceConfig(resourceConfig);
+            return true;
         }
+
         return false;
     }
 }

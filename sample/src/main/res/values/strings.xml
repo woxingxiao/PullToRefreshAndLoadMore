@@ -1,4 +1,17 @@
 <resources>
     <string name="app_name">PullToRefreshAndLoadMore</string>
     <string name="has_no_data">没有内容，刷新一下吧~</string>
+
+    <string name="pull_to_refresh">pull to refresh</string>
+    <string name="release_to_refresh">release to refresh</string>
+    <string name="refreshing">refreshing&#8230;</string>
+    <string name="refresh_succeeded">refresh succeeded</string>
+    <string name="refresh_failed">refresh failed</string>
+    <string name="pull_up_to_load">pull up to load</string>
+    <string name="release_to_load">release to load</string>
+    <string name="loading">loading&#8230;</string>
+    <string name="load_succeeded">load succeeded</string>
+    <string name="load_failed">load failed</string>
+
+    <string name="customize_resources">cus resources</string>
 </resources>
