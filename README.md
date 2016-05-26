@@ -11,7 +11,7 @@ dependencies{
 ```
 
 ###Demo
-![demo2](https://github.com/woxingxiao/PullToRefreshAndLoadMore/blob/master/screenshots/demo2.gif)
+![demo3](https://github.com/woxingxiao/PullToRefreshAndLoadMore/blob/master/screenshots/demo3.gif)
 
 
 ###自定义资源(Customize Resources)
