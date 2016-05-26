@@ -367,8 +367,7 @@ public class PullToRefreshLayout extends RelativeLayout {
             case MotionEvent.ACTION_MOVE:
                 if (mEvents == 0) {
                     if (pullDownY > 0
-                            || (((Pullable) mPullableView).canPullDown()
-                            && canPullDown && stage != LOADING)) {
+                            || (((Pullable) mPullableView).canPullDown() && canPullDown && stage != LOADING)) {
                         // 可以下拉，正在加载时不能下拉
                         // 对实际滑动距离做缩小，造成用力拉的感觉
                         pullDownY = pullDownY + (ev.getY() - lastY) / radio;
@@ -483,7 +482,10 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     public void setResourceConfig(@NonNull ResourceConfig resourceConfig) {
         mResourceConfig = resourceConfig;
-        postInvalidate();
+        refreshArrowImg.setImageResource(mResourceConfig.getImageResIds()[0]);
+        loadArrowImg.setImageResource(mResourceConfig.getImageResIds()[0]);
+        refreshHintText.setText(mResourceConfig.getTextResIds()[0]);
+        refreshHintText.setText(mResourceConfig.getTextResIds()[5]);
     }
 
     /**
