@@ -1,12 +1,24 @@
-[![Download](https://api.bintray.com/packages/woxingxiao/maven/PullToRefreshAndLoadMore/images/download.svg)](https://bintray.com/woxingxiao/maven/PullToRefreshAndLoadMore/_latestVersion)
+[![](https://jitpack.io/v/woxingxiao/PullToRefreshAndLoadMore.svg)](https://jitpack.io/#woxingxiao/PullToRefreshAndLoadMore)
 
 ****
 **一个轻量下拉刷新上拉加载更多控件，已封装ListView**
 ****
+
+由于`bintray`上不去无法更新版本（梯子也不行），因此从`v2.0`起以后的更新都将发布到`JitPack`上。
+
 ###Gradle
 ```groove
+allprojects {
+		repositories {
+			...
+			maven { url "https://jitpack.io" }
+		}
+	}
+
+	...
+
 dependencies{
-    compile 'com.xw.repo:PullToRefresh:1.1.0@aar'
+    compile 'com.github.woxingxiao:PullToRefreshAndLoadMore:v2.0'
 }
 ```
 
