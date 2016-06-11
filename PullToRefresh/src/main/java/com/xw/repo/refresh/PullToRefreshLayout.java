@@ -85,17 +85,19 @@ public class PullToRefreshLayout extends RelativeLayout {
                 }
 
             }
-            if (pullDownY > 0)
+            if (pullDownY > 0) {
                 pullDownY -= MOVE_SPEED;
-            else if (pullUpY < 0)
+            } else if (pullUpY < 0) {
                 pullUpY += MOVE_SPEED;
+            }
             if (pullDownY < 0) {
                 // 已完成回弹
                 pullDownY = 0;
                 refreshArrowImg.clearAnimation();
                 // 隐藏下拉头时有可能还在刷新，只有当前状态不是正在刷新时才改变状态
-                if (stage != REFRESHING && stage != LOADING)
+                if (stage != REFRESHING && stage != LOADING) {
                     changeStage(INIT);
+                }
                 timer.cancel();
                 requestLayout();
             }
@@ -104,16 +106,18 @@ public class PullToRefreshLayout extends RelativeLayout {
                 pullUpY = 0;
                 loadArrowImg.clearAnimation();
                 // 隐藏上拉头时有可能还在刷新，只有当前状态不是正在刷新时才改变状态
-                if (stage != REFRESHING && stage != LOADING)
+                if (stage != REFRESHING && stage != LOADING) {
                     changeStage(INIT);
+                }
                 timer.cancel();
                 requestLayout();
             }
             // 刷新布局,会自动调用onLayout
             requestLayout();
             // 没有拖拉或者回弹完成
-            if (pullDownY + Math.abs(pullUpY) == 0)
+            if (pullDownY + Math.abs(pullUpY) == 0) {
                 timer.cancel();
+            }
         }
     };
 
@@ -157,8 +161,9 @@ public class PullToRefreshLayout extends RelativeLayout {
         if (isFirstTimeCallOnLayout) {
             isFirstTimeCallOnLayout = false;
             mPullableView = getChildAt(2);
-            if (getChildCount() > 3)
-                throw new IllegalArgumentException("PullToRefreshLayout should only has one direct child in xml !");
+            if (getChildCount() > 3) {
+                throw new IllegalArgumentException("PullToRefreshLayout should only has one direct child !");
+            }
             initView();
         }
         refreshDist = ((ViewGroup) refreshView).getChildAt(0).getMeasuredHeight();
@@ -204,8 +209,9 @@ public class PullToRefreshLayout extends RelativeLayout {
      * @param isSuccess true成功，false失败
      */
     public void refreshFinish(boolean isSuccess) {
-        if (refreshingBar == null || refreshHintText == null)
+        if (refreshingBar == null || refreshHintText == null) {
             return;
+        }
         refreshingBar.clearAnimation();
         refreshingBar.setVisibility(View.INVISIBLE);
 
@@ -244,8 +250,9 @@ public class PullToRefreshLayout extends RelativeLayout {
      * @param isSuccess true成功，false代表失败
      */
     public void loadMoreFinish(boolean isSuccess) {
-        if (loadingBar == null || loadHintText == null)
+        if (loadingBar == null || loadHintText == null) {
             return;
+        }
         loadingBar.clearAnimation();
         loadingBar.setVisibility(View.INVISIBLE);
 
@@ -443,21 +450,22 @@ public class PullToRefreshLayout extends RelativeLayout {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (pullDownY > refreshDist || -pullUpY > loadMoreDist)
                 // 正在刷新时往下拉（正在加载时往上拉），释放后下拉头（上拉头）不隐藏
-                {
+                if (pullDownY > refreshDist || -pullUpY > loadMoreDist) {
                     isTouch = false;
                 }
                 if (stage == RELEASE_TO_REFRESH) {
                     changeStage(REFRESHING);
                     // 刷新操作
-                    if (mOnRefreshListener != null)
+                    if (mOnRefreshListener != null) {
                         mOnRefreshListener.onRefresh(this);
+                    }
                 } else if (stage == RELEASE_TO_LOAD) {
                     changeStage(LOADING);
                     // 加载操作
-                    if (mOnRefreshListener != null)
+                    if (mOnRefreshListener != null) {
                         mOnRefreshListener.onLoadMore(this);
+                    }
                 }
                 hide();
             default:
@@ -511,15 +519,17 @@ public class PullToRefreshLayout extends RelativeLayout {
         protected void onPostExecute(String result) {
             changeStage(REFRESHING);
             // 刷新操作
-            if (mOnRefreshListener != null)
+            if (mOnRefreshListener != null) {
                 mOnRefreshListener.onRefresh(PullToRefreshLayout.this);
+            }
             hide();
         }
 
         @Override
         protected void onProgressUpdate(Float... values) {
-            if (pullDownY > refreshDist)
+            if (pullDownY > refreshDist) {
                 changeStage(RELEASE_TO_REFRESH);
+            }
             requestLayout();
         }
 
@@ -541,8 +551,9 @@ public class PullToRefreshLayout extends RelativeLayout {
         requestLayout();
         changeStage(LOADING);
         // 加载操作
-        if (mOnRefreshListener != null)
+        if (mOnRefreshListener != null) {
             mOnRefreshListener.onLoadMore(this);
+        }
     }
 
     /**
