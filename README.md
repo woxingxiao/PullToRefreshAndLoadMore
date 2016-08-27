@@ -1,5 +1,7 @@
 [![Download](https://api.bintray.com/packages/woxingxiao/maven/PullToRefreshAndLoadMore/images/download.svg)](https://bintray.com/woxingxiao/maven/PullToRefreshAndLoadMore/_latestVersion)
 
+~~DEPRECATED~~
+
 ****
 **一个轻量下拉刷新上拉加载更多控件，已封装ListView**
 ****
